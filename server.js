@@ -3,10 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const Contact = require('./models/Contact');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
@@ -19,32 +17,29 @@ const MONGO_URI = process.env.MONGO_URI;
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    serverSelectionTimeoutMS: 30000,  // ⬅️ Increase timeout to 30 seconds
-    socketTimeoutMS: 45000           // ⬅️ Increase socket timeout
+    serverSelectionTimeoutMS: 60000,  // ⬅️ Increase timeout to 60 seconds
+    socketTimeoutMS: 60000            // ⬅️ Increase socket timeout
 })
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.error('MongoDB Connection Error:', err));
+.then(() => console.log('✅ MongoDB Connected'))
+.catch(err => console.error('❌ MongoDB Connection Error:', err));
 
-
-// Root Route
-app.get('/', (req, res) => {
-    res.send('Backend API is running...');
+// Define Contact Schema
+const ContactSchema = new mongoose.Schema({
+    firstName: { type: String, required: true },
+    lastName: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    message: { type: String, required: true },
+    createdAt: { type: Date, default: Date.now }
 });
 
-// POST API Endpoint
+const Contact = mongoose.model('Contact', ContactSchema);
+
+// API Endpoint
 app.post('/api/contact', async (req, res) => {
     try {
-        const { firstName, lastName, email, phone, message } = req.body;
-
-        const newContact = new Contact({
-            firstName,
-            lastName,
-            email,
-            phone,
-            message
-        });
-
-        await newContact.save();
+        const contact = new Contact(req.body);
+        await contact.save();
         res.status(201).json({ message: 'Contact saved successfully' });
     } catch (error) {
         console.error('Error saving contact:', error);
@@ -52,7 +47,6 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Start Server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
