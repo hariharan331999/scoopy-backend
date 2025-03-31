@@ -14,6 +14,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB Connection
+const MONGO_URI = process.env.MONGO_URI;
+
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -22,6 +24,7 @@ mongoose.connect(MONGO_URI, {
 })
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.error('MongoDB Connection Error:', err));
+
 
 // Root Route
 app.get('/', (req, res) => {
