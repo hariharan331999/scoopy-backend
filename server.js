@@ -14,12 +14,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 30000,  // ⬅️ Increase timeout to 30 seconds
+    socketTimeoutMS: 45000           // ⬅️ Increase socket timeout
 })
-    .then(() => console.log('MongoDB Atlas Connected'))
-    .catch(err => console.error('MongoDB Atlas Connection Error:', err));
+.then(() => console.log('MongoDB Connected'))
+.catch(err => console.error('MongoDB Connection Error:', err));
 
 // Root Route
 app.get('/', (req, res) => {
